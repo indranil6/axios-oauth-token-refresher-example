@@ -6,9 +6,9 @@ const cors = require("cors");
 const app = express();
 app.use(bodyParser.json());
 app.use(cors()); // Add this line to enable CORS
-const SECRET_KEY = "your-secret-key";
-const REFRESH_SECRET_KEY = "your-refresh-secret-key";
-const ACCESS_TOKEN_EXPIRES_IN = 10;
+const SECRET_KEY = "your-secret-key-here";
+const REFRESH_SECRET_KEY = "your-refresh-secret-key-here";
+const ACCESS_TOKEN_EXPIRES_IN = 20;
 
 const users = [
   { id: 1, username: "user1", password: "password1" },
@@ -39,7 +39,9 @@ app.post("/login", (req, res) => {
   if (user) {
     const accessToken = generateAccessToken({ username: user.username });
     const refreshToken = generateRefreshToken({ username: user.username });
-    res.json({ accessToken, refreshToken });
+    setTimeout(() => {
+      res.json({ accessToken, refreshToken });
+    }, 1000);
   } else {
     res.status(401).json({ message: "Invalid credentials" });
   }
@@ -47,7 +49,7 @@ app.post("/login", (req, res) => {
 
 // Token Refresh API
 app.post("/token", (req, res) => {
-  const { token } = req.body;
+  const { refresh_token: token = "" } = req.body;
 
   if (!token) {
     return res.status(401).json({ message: "Token is required" });
@@ -68,8 +70,9 @@ app.post("/token", (req, res) => {
     // Remove old refresh token and add new one
     refreshTokens = refreshTokens.filter((rt) => rt !== token);
     refreshTokens.push(refreshToken);
-
-    res.json({ accessToken, refreshToken });
+    setTimeout(() => {
+      res.json({ access_token: accessToken, refresh_token: refreshToken });
+    }, 1000);
   });
 });
 

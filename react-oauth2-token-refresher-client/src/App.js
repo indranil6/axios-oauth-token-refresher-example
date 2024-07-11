@@ -28,12 +28,26 @@ const App = () => {
 
   const axiosInstance = new AxiosInstance({
     axios,
+    axiosConfig: {
+      timeout: 5000,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+    isBearer: true,
     baseURL: "http://localhost:5000",
     accessTokenStorage: Storages.localStorage,
     refreshTokenStorage: Storages.localStorage,
     accessTokenStorageKey: "accessToken",
     refreshTokenStorageKey: "refreshToken",
-    accessTokenRefresherEndpoint: "http://localhost:5000/token",
+    accessTokenRefresherEndpoint: "/token",
+    tokenRefresherPayloadGenerator: (token) => ({
+      refresh_token: token,
+    }),
+    accessTokenGetterFnFromRefresherResponse: (response) =>
+      response.data.access_token,
+    refreshTokenGetterFnFromRefresherResponse: (response) =>
+      response.data.refresh_token,
   }).getAxiosInstance();
 
   return (
